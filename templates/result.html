@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Result</title>
+    <link rel="stylesheet" href="/static/result_style.css">
+</head>
+<body>
+<h1> Client Portfolio Market Signal Impact </h1>
+    <h2> Client: {{ client }}</h2>
+    <div class="main-content">
+        <h3> Total Current Market Value(TCMV) = {{ total_market_value }} </h3>
+        <h3> Total Current Book Value(TCBV) = {{ total_book_value }} </h3>
+        <div id="individual">
+        {% for i in individual_data %}
+        <h3> For instrument {{ i }} with projection of {{ input[i] }}</h3>
+        <ol type="A">
+            <li>Current Market value of instrument: {{individual_data[i]['current_market_value']}} </li>
+            <li>Projected Market value of instrument: {{individual_data[i]['new_market_value']}} <div> ({{input[i]}}*A + A) </div> </li>
+            <li>Projected Total Market value for change in instrument: {{individual_data[i]['new_total_market_value']}} <div> TCMV+(B-A) </div></li>
+            <li>% Impact on Market Value: {{individual_data[i]['analysis']['market_value_change']}} <div> (C - TCMV)/TCMV  * 100 </div></li>
+            <li>Overall % Impact on Book Value : {{individual_data[i]['analysis']['new_market_to_book_value']}} <div> (C - TCBV)/TCBV * 100 </div></li>
+        </ol>
+            {% endfor %}
+        </div>
+        <div class="analysis">
+            <h1> Overall Changes</h1>
+            <ol type="a">
+              <li> Overall Percentage Impact on Market Value: {{ overall_data['percent_change_mv'] }} </li>
+              <li> Overall Percentage Impact on Book Value: {{ overall_data['nmv_to_bv'] }} </li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>

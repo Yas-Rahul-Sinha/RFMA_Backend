@@ -1,0 +1,20 @@
+h1{
+    text-align: center;
+    background-color: blue;
+}
+form{
+    display: flex;
+    align-content: center;
+    flex-direction: column;
+    justify-content: center;
+}
+select{
+    margin: 10px;
+    width: 40vw;
+}
+input{
+    width: 40vw;
+}
+.submit_button{
+    width: 10vw;
+}

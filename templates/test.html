@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/market_style.css">
+</head>
+
+<body>
+    <h1>CLIENT PORTFOLIO - MARKET SIGNAL IMPACTS</h1>
+    <div class="body">
+        <h1 id="advisor">{{ advisor }}</h1>
+                <form>
+                    {{ form.csrf_token }}
+                    {{ form.client }}
+                    <!--      {{ form.description_type }}-->
+                    {{ form.instrument }}
+                    <div id="current_value"></div>
+                    <div class="input_field">
+                        Enter value in % or total amount
+                        <input type="text" name="input_data" id="input_data">
+                    </div>
+                    <button type="button" id="add">Add</button>
+                </form>
+            <form action="/market_signal_impact/param/result" id="display-added" method="post">
+                <fieldset id="display-options">
+
+                </fieldset>
+                <input type="submit" id="submit" value="Submit">
+            </form>
+
+    </div>
+    <script>
+        let client_select = document.getElementById('client')
+        let description_select = document.getElementById('description_type')
+        let instrument = document.getElementById('instrument')
+        let advisor = document.getElementById('advisor').innerHTML
+        let current = document.getElementById('current_value')
+        client_select.onchange = () => {
+            let client = client_select.value;
+            let endpointparam1 = encodeURIComponent(advisor);
+            let endpointparam2 = encodeURIComponent(client);
+            fetch('/market_signal_impact/param' + '?advisor=' + endpointparam1 + '&' + 'investor=' + endpointparam2).then((response) => {
+                response.json().then((data) => {
+                    let optionHTML = ''
+                    for (let inv in data.client) {
+                        optionHTML += "<option value=" + encodeURIComponent(data.client[inv].Description) + ">" + data.client[inv].Description + " (" + data.client[inv]["Portfolio Weightage"] + ")</option>"
+                    }
+                    instrument.innerHTML = optionHTML;
+                })
+            })
+        }
+        instrument.onchange = () => {
+            let client = client_select.value;
+            let ins = instrument.value;
+            let endpointparam1 = encodeURIComponent(advisor);
+            let endpointparam2 = encodeURIComponent(client);
+            console.log(instrument.value)
+            fetch('/market_signal_impact/param' + '?advisor=' + endpointparam1 + '&' + 'investor=' + endpointparam2).then((response) => {
+                response.json().then((data) => {
+                    for (let inv in data.client) {
+                        if (encodeURIComponent(data.client[inv].Description) == ins) {
+                            current.innerHTML = "<h4>Book Value is " + data.client[inv]["Book Value"] + "</h4>" + "<h4>Current Market Value is " + data.client[inv]["Market Value"] + "<h4>"
+                        }
+                    }
+                    instrument.innerHTML = optionHTML;
+                })
+            })
+        }
+        let post_data = [];
+        let add = document.getElementById('add');
+        let display = document.getElementById('display-options');
+        let submit = document.getElementById('submit')
+        add.onclick = () => {
+            let input_data = document.getElementById('input_data').value
+            let client = client_select.value
+            let inst = instrument.value
+            if (post_data.length != 0 && post_data[0].client != client) {
+                alert("Multiple Inputs is Possible for a Single Client Only")
+            }
+            else {
+                let obj = { 'client': client, 'instrument': inst, 'input': input_data }
+                post_data.push(obj)
+            }
+            let displayHTML = ""
+            for (let j in post_data) {
+                let str = "<input readonly name='"+ encodeURIComponent(post_data[j].instrument) + "'" + `value="{'client':` + "'"+ post_data[j].client + "'" + ",  'instrument':" + "'" + decodeURIComponent(post_data[j].instrument) + "'" + ",  'input':" + "'" + post_data[j].input + "'" + '}">'
+                displayHTML += str
+            }
+            display.innerHTML = displayHTML;
+        }
+
+    </script>
+</body>
+
+</html>

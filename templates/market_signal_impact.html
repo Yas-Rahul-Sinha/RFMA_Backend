@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/static/market_style.css">
+</head>
+<body>
+  <h1>CLIENT PORTFOLIO - MARKET SIGNAL IMPACTS</h1>
+  <div class="body">
+      <h1 id="advisor">{{ advisor }}</h1>
+          <form method="post" action="/market_signal_impact/param/result">
+              {{ form.csrf_token }}
+              {{ form.client }}
+<!--      {{ form.description_type }}-->
+              {{ form.instrument }}
+              <div id="current_value"></div>
+              <div class="input_field">
+                Enter value in % or total amount
+                <input type="text" name="input_data" id="input_data">
+              </div>
+              <input type="submit" value="Calculate Impact" id="calculate">
+        </form>
+    <div class="result">
+
+    </div>
+  </div>
+  <div class="total">
+
+  </div>
+    <script>
+        let client_select = document.getElementById('client')
+        let description_select = document.getElementById('description_type')
+        let instrument = document.getElementById('instrument')
+        let advisor = document.getElementById('advisor').innerHTML
+        let fetch_submit = document.getElementById('fetchDetails')
+        let current = document.getElementById('current_value')
+        client_select.onchange = ()=>{
+            let client = client_select.value;
+            let endpointparam1 = encodeURIComponent(advisor);
+            let endpointparam2 = encodeURIComponent(client);
+            fetch('/market_signal_impact/param'+'?advisor='+endpointparam1+'&'+'investor='+endpointparam2).then((response)=>{
+                response.json().then((data)=>{
+                    let optionHTML = ''
+                    for(let inv in data.client){
+                        optionHTML += "<option value=" + encodeURIComponent(data.client[inv].Description) + ">" + data.client[inv].Description + " (" + data.client[inv]["Portfolio Weightage"] + ")</option>"
+                    }
+                    instrument.innerHTML = optionHTML;
+                })
+            })
+        }
+        instrument.onchange = ()=>{
+            let client = client_select.value;
+            let ins = instrument.value;
+            let endpointparam1 = encodeURIComponent(advisor);
+            let endpointparam2 = encodeURIComponent(client);
+            console.log(instrument.value)
+            fetch('/market_signal_impact/param'+'?advisor='+endpointparam1+'&'+'investor='+endpointparam2).then((response)=>{
+                response.json().then((data)=>{
+                    for(let inv in data.client){
+                         if(encodeURIComponent(data.client[inv].Description) == ins){
+                            current.innerHTML = "<h4>Book Value is " + data.client[inv]["Book Value"]+ "</h4>" + "<h4>Current Market Value is " + data.client[inv]["Market Value"] + "<h4>"
+                            }
+                    }
+                    instrument.innerHTML = optionHTML;
+                })
+            })
+        }
+  </script>
+</body>
+</html>

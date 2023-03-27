@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADVISOR DASHBOARD</title>
+    <link rel="stylesheet" href="/static/styles.css" >
+</head>
+<body>
+<h1 class="heading"> ADVISOR DASHBOARD</h1>
+<div class="main_content">
+<div>
+    <table border="2px" id="client_data" class="dashboard_component">
+        <caption> Advisor name : {{advisor_name}}</caption>
+        <thead>
+        <tr>
+            <th>client list</th>
+            <th>$MM</th>
+            <th>Book Value</th>
+            <th>Country</th>
+            <th>Risk profile</th>
+        </tr>
+         {% for client in advisor["Investor Name"] %}
+        <tr>
+            <th>{{ client }}</th>
+            <th>{{ '%0.2f'|format(advisor["Investor Name"][client]["Amount"]|float) }}</th>
+            <th>{{ '%0.2f'|format(advisor["Investor Name"][client]["Book Value"]|float) }}</th>
+            <th>{{ advisor["Investor Name"][client]["Currency"] }}</th>
+            <th>Risk profile</th>
+        </tr>
+        {% endfor %}
+        </thead>
+    </table>
+    <ul class="Legend">
+        <caption> Color Code </caption>
+  <li class="Legend-item">
+    <span class="Legend-colorBox" style="background-color: #2cba00;">
+    </span>
+    <span class="Legend-label">
+      Very Positive
+    </span>
+  </li><li class="Legend-item">
+    <span class="Legend-colorBox" style="background-color: #a3ff00;">
+    </span>
+    <span class="Legend-label">
+       Positive
+    </span>
+  </li><li class="Legend-item">
+    <span class="Legend-colorBox" style="background-color: #fa8072;">
+    </span>
+    <span class="Legend-label">
+       Negative
+    </span>
+  </li><li class="Legend-item">
+    <span class="Legend-colorBox" style="background-color: #ff0000;">
+    </span>
+    <span class="Legend-label">
+       Very Negative
+    </span>
+  </li><li class="Legend-item">
+    <span class="Legend-colorBox" style="background-color: #ffb6c1;">
+    </span>
+    <span class="Legend-label">
+       Low Impact
+    </span>
+  </li><li class="Legend-item">
+    <span class="Legend-colorBox" style="background-color: #ffbf00;">
+    </span>
+    <span class="Legend-label">
+       No Impact
+    </span>
+  </li><li class="Legend-item">
+    <span class="Legend-colorBox" style="background-color: #8b0000;">
+    </span>
+    <span class="Legend-label">
+       Investment Review Required
+    </span>
+  </li>
+</ul>
+    <table border="2px" id="market_signal" class="dashboard_component">
+        <caption> Market Signal</caption>
+        <thead>
+        <tr>
+            <th>symbol</th>
+            <th>security description</th>
+            <th>New Preview</th>
+            <th>Date time</th>
+        </tr>
+        {% for security in market_news %}
+        {% if security["Impacts"] == "Very Positive" %}
+            {% set classs = "VP" %}
+        {% elif security["Impacts"] == "Very Negative" %}
+            {% set classs = "VN" %}
+        {% else %}
+            {% set classs = security["Impacts"] %}
+        {% endif %}
+        <tr>
+            <td>{{ security["SYMBOL"] }}</td>
+            <td>{{ security["Description"] }}</td>
+            <td class={{ classs }}>{{ security["Impacts"] }}</td>
+            <td>{{ security["Market News - Date"] }}</td>
+        </tr>
+        {% endfor %}
+        </thead>
+    </table>
+    <style>
+        td.VP{background-color: #2cba00;}
+        td.Positive{background-color: #a3ff00;}
+        td.Negative{background-color: #fa8072;}
+        td.VN{background-color: #ff0000;}
+        td.Low{background-color: #ffb6c1;}
+        td.No{background-color: #ffbf00;}
+        td.Investment{background-color: #8b0000;}
+    </style>
+    <table border="2px" id="client_escalation" class="dashboard_component">
+        <caption> Client Escallation</caption>
+        <thead>
+        <tr>
+            <th>Client Name</th>
+            <th>Escallation</th>
+            <th>Reason</th>
+            <th>Date</th>
+        </tr>
+        {% for client in escalation %}
+        <tr>
+            <td>{{client["Investor Name"]}}</td>
+            <td>{{client["Type of Escalation"]}}</td>
+            <td>{{client["Reason"]}}</td>
+            <td>{{client["Scheduled Date"]}}</td>
+        </tr>
+        {% endfor %}
+        </thead>
+    </table>
+    <table border="2px" id="crm" class="dashboard_component">
+        <caption>Priority based on Customer Interactions CRM</caption>
+        <thead>
+        <tr>
+            <th>Client Name</th>
+            <th>Escallation</th>
+            <th>Reason</th>
+            <th>Date</th>
+        </tr>
+        {% for client in crm %}
+        <tr>
+            <td>{{client["Investor Name"]}}</td>
+            <td>{{client["Type of Escalation"]}}</td>
+            <td>{{client["Reason"]}}</td>
+            <td>{{client["Scheduled Date"]}}</td>
+        </tr>
+        {% endfor %}
+        </thead>
+    </table>
+</div>
+<div>
+    <table border="2px solid black"  class="prioritise">
+        <caption> Prioritize Customer Meetings</caption>
+            <tr>
+                <th>Date</th>
+                <th>Client Name</th>
+                <th>Contact Person</th>
+                <th>Contact Number</th>
+                <th>Reason</th>
+                <th>Client Portfolio</th>
+                <th>Portfolio Predictions</th>
+            </tr>
+            <tr>
+                <td>MM/DD/YYYY HH/MN/SC</td>
+                <td>Client Name</td>
+                <td>John Doe</td>
+                <td>+11234567890</td>
+                <td>Free text</td>
+                <td>client portfolio</td>
+                <td>Portfolio Predictions</td>
+                </tr>
+        <tr>
+            <td>MM/DD/YYYY HH/MN/SC</td>
+            <td>Client Name</td>
+            <td>John Doe</td>
+            <td>+11234567890</td>
+            <td>Free text</td>
+            <td>client portfolio</td>
+            <td>Portfolio Predictions</td>
+        </tr>
+        <tr>
+            <td>MM/DD/YYYY HH/MN/SC</td>
+            <td>Client Name</td>
+            <td>John Doe</td>
+            <td>+11234567890</td>
+            <td>Free text</td>
+            <td>client portfolio</td>
+            <td>Portfolio Predictions</td>
+        </tr>
+        <tr>
+            <td>MM/DD/YYYY HH/MN/SC</td>
+            <td>Client Name</td>
+            <td>John Doe</td>
+            <td>+11234567890</td>
+            <td>Free text</td>
+            <td>client portfolio</td>
+            <td>Portfolio Predictions</td>
+        </tr>
+        <tr>
+            <td>MM/DD/YYYY HH/MN/SC</td>
+            <td>Client Name</td>
+            <td>John Doe</td>
+            <td>+11234567890</td>
+            <td>Free text</td>
+            <td>client portfolio</td>
+            <td>Portfolio Predictions</td>
+        </tr>
+        <tr>
+            <td>MM/DD/YYYY HH/MN/SC</td>
+            <td>Client Name</td>
+            <td>John Doe</td>
+            <td>+11234567890</td>
+            <td>Free text</td>
+            <td>client portfolio</td>
+            <td>Portfolio Predictions</td>
+        </tr>
+        <tr>
+            <td>MM/DD/YYYY HH/MN/SC</td>
+            <td>Client Name</td>
+            <td>John Doe</td>
+            <td>+11234567890</td>
+            <td>Free text</td>
+            <td>client portfolio</td>
+            <td>Portfolio Predictions</td>
+        </tr>
+        <tr>
+            <td>MM/DD/YYYY HH/MN/SC</td>
+            <td>Client Name</td>
+            <td>John Doe</td>
+            <td>+11234567890</td>
+            <td>Free text</td>
+            <td>client portfolio</td>
+            <td>Portfolio Predictions</td>
+        </tr>
+        <tr>            <td>MM/DD/YYYY HH/MN/SC</td>            <td>Client Name</td>            <td>John Doe</td>            <td>+11234567890</td>            <td>Free text</td>            <td>client portfolio</td>            <td>Portfolio Predictions</td>        </tr>        </thead>    </table>
+</div>
+    </div>
+</body>
+</html>
+

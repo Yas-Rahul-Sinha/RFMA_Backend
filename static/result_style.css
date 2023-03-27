@@ -1,0 +1,22 @@
+h1{
+    display: flex;
+    justify-content: center;
+}
+.main-content{
+    display: flex;
+    justify-content: space-between;
+}
+.current-value{
+    background-color: rgba(157, 241, 72, 0.128);
+    width: 49vw;
+}
+.calculated-value{
+    background-color: rgba(75, 75, 226, 0.231);
+    width: 49vw;
+}
+.analysis{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(231, 57, 57, 0.19);
+}
