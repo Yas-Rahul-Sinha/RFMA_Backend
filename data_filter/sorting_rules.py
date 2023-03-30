@@ -3,8 +3,8 @@ from data_assessment.client_portfolio import *
 from data_assessment.impact_calculation import *
 from data_assessment.portfolio_info import *
 
-market_research = pd.read_excel("../data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Market Research")
-market_news = pd.read_excel("../data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Market News")
+market_research = pd.read_excel("data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Market Research")
+market_news = pd.read_excel("data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Market News")
 def byMarketReview(advisor, category,type,threshold,portfolio_size):
     category_filter = market_research[market_research["Category"] == category]
     type_filter = category_filter[category_filter["Type"] == type]
@@ -19,7 +19,8 @@ def byMarketReview(advisor, category,type,threshold,portfolio_size):
                 if imp >= threshold and getPortfolioMarketValue(acc) > portfolio_size:
                     temp2["Client"] = accountOwner(acc)
                     temp2["Impact"] = imp
-                    temp2["Reason"] = f"Impact of {imp} on portfolio due to change in {category} of {type}"
+                    temp2["Reason"] = f"Impact:{imp} due to change in {type}"
+                    temp2["Total_Investment"] = getPortfolioMarketValue(acc)
                     temp.append(temp2.copy())
                     # temp.append({"Client":accountOwner(acc),"Impact":imp,"Reason":f"Impact of {imp} on portfolio due to change in {category} of {type}"})
     temp.sort(key=lambda x:x["Impact"])
@@ -38,7 +39,9 @@ def byMarketNews(advisor, category, type, portfolio_size):
                 if getPortfolioMarketValue(acc) > portfolio_size:
                     temp2["Client"] = accountOwner(acc)
                     temp2["Impact"] = type
-                    temp2["Reason"] = f"{type} impact on portfolio as per {category} related market news"
+                    temp2["Reason"] = f"{type} impact as per market news"
+                    temp2["Affected_Protfolio_Value"] = getPortfolioMarketValue(acc)
+                    temp2["Total_Investment"] = getClientTotalInvestment(accountOwner(acc))
                     temp.append(temp2.copy())
     return temp
 
@@ -58,22 +61,26 @@ def byInvestmentReview(advisor, type, portfolio_size):
             if result < 0.2 and getPortfolioMarketValue(acc) > portfolio_size:
                 temp2["Client"] = accountOwner(acc)
                 temp2["Impact"] = result
-                temp2["Reason"] = f"client account {acc} is performing poorly with yield of {result}%"
+                temp2["Reason"] = f"Poor Account Performance"
+                temp2["Affected_Protfolio_Value"] = getPortfolioMarketValue(acc)
+                temp2["Total_Investment"] = getClientTotalInvestment(accountOwner(acc))
                 temp.append(temp2.copy())
         return temp
     elif type == "Periodic Portfolio Review":
-        all_clients = pd.read_excel("../data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Periodic Performance Review")
+        all_clients = pd.read_excel("data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Periodic Performance Review")
         # print(all_clients)
         relevent_clients = all_clients[all_clients["Advisor"] == advisor]
         # print(relevent_clients)
         for client,total_investment in zip(relevent_clients["Client"],relevent_clients["Total_Investment"]):
             temp2["Client"] = client
             temp2["Impact"] = total_investment
-            temp2["Reason"] = f"Periodic Portfolio Review of {client} whose total investment is {total_investment}"
+            temp2["Reason"] = f"Periodic Portfolio Review"
+            temp2["Affected_Protfolio_Value"] = "NA"
+            temp2["Total_Investment"] = total_investment
             temp.append(temp2.copy())
         return temp
     elif type == "Personal Events":
-        all_clients = pd.read_excel("../data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Personal Events")
+        all_clients = pd.read_excel("data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Personal Events")
         # print(all_clients)
         temp_client = all_clients[all_clients["Event_Type"] == "Investment Review"]
         # print(temp_client)
@@ -82,11 +89,13 @@ def byInvestmentReview(advisor, type, portfolio_size):
         for client,event in zip(relevent_client["Client_Name"], relevent_client["Event"]):
             temp2["Client"] = client
             temp2["Impact"] = event
-            temp2["Reason"] = f"{client} has an event {event}"
+            temp2["Reason"] = f"Event:{event}"
+            temp2["Affected_Protfolio_Value"] = "NA"
+            temp2["Total_Investment"] = getClientTotalInvestment(client)
             temp.append(temp2.copy())
         return temp
     elif type == "Portfolio Recommendation":
-        products = pd.read_excel("../data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="New Products")
+        products = pd.read_excel("data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="New Products")
         client_list = getClientList(advisor)
         for client in client_list:
             current_investment = getClientTotalInvestment(client)
@@ -95,17 +104,21 @@ def byInvestmentReview(advisor, type, portfolio_size):
             recommended_product = recommended_product_df["Product_Name"].iloc[0]
             temp2["Client"] = client
             temp2["Impact"] = recommended_product
-            temp2["Reason"] = f"Product Recommendation to {client} of product {recommended_product} who is having a total investment of {current_investment}"
+            temp2["Reason"] = f"Product Recommendation:{recommended_product}"
+            temp2["Affected_Protfolio_Value"] = "NA"
+            temp2["Total_Investment"] = current_investment
             temp.append(temp2.copy())
         return temp
     if type == "Additional Investment":
-        data = pd.read_excel("../data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Client Requested Meetings")
+        data = pd.read_excel("data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Client Requested Meetings")
         filter_data = data[data["Reason"] == "Additional Investment"]
         required_data = filter_data[filter_data["Advisor"] == advisor]
         for client in required_data["Client"]:
             temp2["Client"] = client
             temp2["Impact"] = type
-            temp2["Reason"] = f"{client} wants to do Additional Investment"
+            temp2["Reason"] = f"Additional Investment"
+            temp2["Affected_Protfolio_Value"] = "NA"
+            temp2["Total_Investment"] = getClientTotalInvestment(client)
             temp.append(temp2.copy())
         return temp
 # print(byMarketNews("Gunasiri","Financial","Negative",10000))
@@ -117,7 +130,7 @@ def byInvestmentReview(advisor, type, portfolio_size):
 def byClientEscalation(advisor, type, porrtfolio_threshold):
     temp = []
     temp2 = {}
-    data = pd.read_excel("../data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Client Requested Meetings")
+    data = pd.read_excel("data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Client Requested Meetings")
     escalation_data = data[data["Type"] == "Client Escalation"]
     relevent_data = escalation_data[escalation_data["Advisor"] == advisor]
     for client,esc_type in zip(relevent_data["Client"],relevent_data["Reason"]):
@@ -125,7 +138,9 @@ def byClientEscalation(advisor, type, porrtfolio_threshold):
         if worth >= porrtfolio_threshold and type == esc_type :
             temp2["Client"] = client
             temp2["Impact"] = esc_type
-            temp2["Reason"] = f"Client Escalation of {esc_type} by client {client} whose total investment is {worth}"
+            temp2["Reason"] = f"Client Escalation:{esc_type}"
+            temp2["Affected_Protfolio_Value"] = "NA"
+            temp2["Total_Investment"] = worth
             temp.append(temp2.copy())
         return temp
 
@@ -134,7 +149,7 @@ def byClientEscalation(advisor, type, porrtfolio_threshold):
 def byOtherClientCommunication(advisor, reason, portfolio_threshold):
     temp = []
     temp2 = {}
-    data = pd.read_excel("../data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Client Requested Meetings")
+    data = pd.read_excel("data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Client Requested Meetings")
     filter_data1 = data[data["Type"] == "Other Client Communication"]
     filter_data2 = filter_data1[filter_data1["Advisor"] == advisor]
     required_data = filter_data2[filter_data2["Reason"] == reason]
@@ -143,7 +158,9 @@ def byOtherClientCommunication(advisor, reason, portfolio_threshold):
         if inv >= portfolio_threshold:
             temp2["Client"] = cli
             temp2["Impact"] = res
-            temp2["Reason"] = f"{cli} requested meeting for {res}"
+            temp2["Reason"] = f"Requested meeting for {res}"
+            temp2["Affected_Protfolio_Value"] = "NA"
+            temp2["Total_Investment"] = inv
             temp.append(temp2.copy())
     return temp
 

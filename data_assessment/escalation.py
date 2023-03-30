@@ -1,6 +1,6 @@
 import pandas as pd
-from main import advisor
-df = pd.read_excel('../data/WM Manager Dashboard Data SetV2.xlsx', sheet_name='Client Escalation', usecols=[0, 4, 9, 10, 11, 12])
+from data_assessment.main import advisor
+df = pd.read_excel('data/WM Manager Dashboard Data SetV2.xlsx', sheet_name='Client Escalation', usecols=[0, 4, 9, 10, 11, 12])
 clientEsc = df.transpose()
 rows, columns = clientEsc.shape
 clientlist = []

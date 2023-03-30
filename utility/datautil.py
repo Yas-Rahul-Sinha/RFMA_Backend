@@ -9,7 +9,7 @@ def randomProjection(current):
     return (current * ((100 + range) / 100))
 
 
-df = pd.read_excel("../data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Instrument Master Price")
+df = pd.read_excel("data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Instrument Master Price")
 def fundProjection():
     fund_data = df[df["Instrument_Type"] == "FUND"]
     # print(fund_data)

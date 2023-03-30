@@ -1,7 +1,7 @@
 import pandas as pd
-from main import portfolios
+from data_assessment.main import portfolios
 
-market = pd.read_excel('../data/WM Manager Dashboard Data SetV2.xlsx', sheet_name='Market News')
+market = pd.read_excel('data/WM Manager Dashboard Data SetV2.xlsx', sheet_name='Market News')
 advisor_list = ["Gunasiri", "Chris", "John", "Sukant"]
 temp = []
 adv_market_temp = {}

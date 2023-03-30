@@ -1,7 +1,7 @@
 import pandas as pd
 from data_assessment.portfolio_info import *
-market_research = pd.read_excel("../data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Market Research")
-instrument_master_price = pd.read_excel("../data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Instrument Master Price")
+market_research = pd.read_excel("data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Market Research")
+instrument_master_price = pd.read_excel("data/WM Manager Dashboard Data SetV2.xlsx", sheet_name="Instrument Master Price")
 merged = pd.merge(market_research,instrument_master_price, on="Security_Description")
 
 def changeInAllInstrument():

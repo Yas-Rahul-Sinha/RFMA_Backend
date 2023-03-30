@@ -1,8 +1,9 @@
 import ast
 from flask_cors import CORS
-from flask import Flask
+from flask import Flask, request
 from flask_restful import Resource,Api,reqparse
 
+from data_assessment.meeting_priority import *
 from data_filter.filter_rule import *
 from data_assessment.main import advisor
 from data_assessment.escalation import temp2
@@ -31,6 +32,8 @@ post_data.add_argument('Value',help='Value', required=True)
 
 filter_data = reqparse.RequestParser()
 filter_data.add_argument('Advisor',help="Advisor Name", required=True)
+filter_data.add_argument('Rule1',help="Atleast one rule is required", required=True)
+filter_data.add_argument('Rule2')
 
 class ClientList(Resource):
     def get(self, adv):
@@ -46,7 +49,10 @@ class ClientEscalation(Resource):
 
 class CRM(Resource):
     def get(self, adv):
-        return {adv:temp3[adv]}
+        # return {adv: temp3[adv]}
+        rules = getRule(adv)
+        ans = filter(rules)
+        return {adv:ans}
 
 class PortfolioData(Resource):
     def get(self,adv,client,account):
@@ -93,8 +99,15 @@ class InstrumentData(Resource):
 
 class FilterRule(Resource):
     def post(self):
-        args = filter_data.parse_args()
-        return filter(args)
+        content_type = request.headers.get('Content-Type')
+        if (content_type == 'application/json'):
+            json = request.json
+            ans = filter(json)
+            writeToSheet(json)
+            print(ans)
+            return ans
+        else:
+            return 'Content-Type not supported!'
 
 api.add_resource(ClientList, '/<string:adv>/clientList')
 api.add_resource(MarketNews, '/<string:adv>/marketNews')

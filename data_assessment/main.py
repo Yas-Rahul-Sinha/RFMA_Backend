@@ -1,7 +1,7 @@
 import math
 import pandas as pd
-portfolios = pd.read_excel('../data/WM Manager Dashboard Data SetV2.xlsx', sheet_name='Portfolio')
-master_price = pd.read_excel('../data/WM Manager Dashboard Data SetV2.xlsx', sheet_name='Instrument Master Price')
+portfolios = pd.read_excel('data/WM Manager Dashboard Data SetV2.xlsx', sheet_name='Portfolio')
+master_price = pd.read_excel('data/WM Manager Dashboard Data SetV2.xlsx', sheet_name='Instrument Master Price')
 portfolios = portfolios.transpose()
 for port in portfolios:
     index = 0
